@@ -1,0 +1,29 @@
+{
+   "volumeSize":[
+      {
+         "name":"<container-name>",
+         "directory":"/var",
+         "recipients":"anilkuscu95@gmail.com",
+         "treshold":5
+      }
+   ],
+   "certificates":[
+      {
+         "name":"mytls.crt",
+         "expireDate":"05.09.2021",
+         "tresholdDay": 10,
+         "address":"https://github.com/anilkusc/test.git",
+         "folder":"./",
+         "recipients":"anilkuscu95@gmail.com",
+         "directory":"crt"
+      }
+   ],
+   "backup":[
+      {
+         "name":"redis",
+         "source":"/data/",
+         "target":"/db_backups/redis/",
+         "tresholdDay":3
+      }
+   ]
+}
