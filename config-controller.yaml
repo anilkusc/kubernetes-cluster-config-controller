@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: config-controller
+spec:
+  selector:
+    matchLabels:
+      name: config-controller
+  template:
+    metadata:
+      labels:
+        name: config-controller
+    spec:
+      containers:
+      - name: config-controller
+        image: anilkuscu95/cluster-config-controller
+        imagePullPolicy: Always
+        env:
+        - name: DEBUG
+          value: "true"       
+        - name: TZ
+          value: "Europe/Istanbul"       
+        volumeMounts:
+        - name: settings
+          mountPath: /app/settings.json
+          subPath: settings.json         
+        - name: backups
+          mountPath: /db_backups/
+        - name: crt
+          mountPath: /certificates/
+        - name: docker
+          mountPath: /var/run/docker.sock
+          readOnly: true
+      volumes:
+      - name: settings
+        configMap:
+          name: settings            
+      - name: backups
+        hostPath:
+          path: /volumes/db_backups/
+      - name: crt
+        hostPath:
+          path: /volumes/certificates/
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: settings
+  labels:
+    app: settings
+data:
+  settings.json: |-
+    {
+       "volumeSize":[
+          {
+             "name":"mongo",
+             "directory":"/data",
+             "recipients":"anilkuscu95@gmail.com",
+             "treshold":100
+          },
+          {
+             "name":"redis",
+             "directory":"/data",
+             "recipients":"anilkuscu95@gmail.com",
+             "treshold":15
+          }
+       ],
+       "certificates":[
+          {
+             "name":"mytls.crt",
+             "expireDate":"04.07.2021",
+             "tresholdDay": 10,
+             "address":"https://<github-username>:<github-password>@<github-address>",
+             "recipients":"anilkuscu95@gmail.com,xxxx@xxx.com",
+             "directory":"/certificates/"
+          }
+       ],
+       "backup":[
+          {
+             "name":"redis",
+             "source":"/data/",
+             "target":"/db_backups/redis/",
+             "tresholdDay":3
+          },
+          {
+             "name":"mongo",
+             "source":"/data/",
+             "target":"/db_backups/mongo/",
+             "tresholdDay":3
+          }          
+       ]
+    }
+   
